@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>えきスタンプラリー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#e60033;--navy:#1d2a5c;--gold:#d9a400;--cream:#fffaf0;--ink:#222;--line:#d8d2c4;--green:#2e9e5b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Zen Maru Gothic",system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:18px;line-height:1.6}
+header{background:var(--navy);color:#fff;padding:14px 16px 10px;position:relative;user-select:none;-webkit-user-select:none}
+header h1{margin:0;font-size:22px;font-weight:900;letter-spacing:.05em}
+header .sub{font-size:13px;opacity:.8}
+header .band{position:absolute;left:0;right:0;bottom:-6px;height:6px;background:var(--red)}
+main{max-width:520px;margin:0 auto;padding:18px 14px 80px}
+.guide{display:flex;gap:10px;align-items:flex-end;margin:6px 0 16px}
+.guide svg{flex:none;width:84px;height:84px}
+.bubble{background:#fff;border:2px solid var(--navy);border-radius:16px;padding:10px 12px;font-weight:700;position:relative;flex:1}
+.bubble:before{content:"";position:absolute;left:-10px;bottom:16px;border:8px solid transparent;border-right-color:var(--navy)}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.station{display:flex;align-items:center;gap:12px}
+.num{flex:none;width:58px;height:58px;border-radius:50%;border:4px solid var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;line-height:1;background:#fff}
+.num small{font-size:11px;color:var(--red)}
+.num b{font-size:20px}
+.station .name{font-size:22px;font-weight:900}
+.station .dist{font-size:14px;color:#666}
+.stamp{margin-left:auto;width:62px;height:62px;flex:none}
+button{font-family:inherit;font-size:18px;font-weight:700;border:none;border-radius:999px;padding:12px 18px;cursor:pointer}
+.primary{background:var(--red);color:#fff;width:100%;margin-top:10px}
+.primary:disabled{background:#ccc;color:#fff}
+.ghost{background:#eee;color:#333}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.choices button{background:#f3f6ff;border:2px solid var(--navy);color:var(--navy);border-radius:14px;font-size:17px;padding:12px 6px}
+.q{font-weight:700}
+.msg{min-height:1.6em;font-weight:700;margin-top:8px}
+.ok{color:var(--green)}.ng{color:var(--red)}
+.pieces{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.piece{width:46px;height:50px;border-radius:12px;background:var(--gold);color:#fff;font-size:28px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 #a77e00}
+.piece.empty{background:#eee;color:#bbb;box-shadow:none;border:2px dashed #ccc}
+button.piece{padding:0}
+button.piece:disabled{opacity:.25}
+.slots{display:flex;gap:6px;justify-content:center;margin:10px 0}
+.slot{width:46px;height:52px;border-bottom:4px solid var(--navy);font-size:30px;font-weight:900;text-align:center}
+.gps{font-size:13px;color:#666;text-align:center;margin-top:6px}
+.medalwrap{text-align:center;perspective:800px}
+.medal{width:220px;height:220px;margin:10px auto;animation:spin 1.6s ease-out}
+@keyframes spin{from{transform:rotateY(720deg) scale(.2);opacity:0}to{transform:rotateY(0) scale(1);opacity:1}}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal .box{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:400px}
+.modal input{width:100%;font-size:18px;padding:10px;border:2px solid var(--line);border-radius:10px;margin:6px 0 10px;font-family:inherit}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{flex:1}
+.small{font-size:13px;color:#666}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <h1>えきスタンプラリー</h1>
+  <div class="sub">つくばエクスプレス　もりや・みどりの</div>
+  <div class="band"></div>
+</header>
+<main>
+  <div class="guide">
+    <svg viewBox="0 0 100 100" aria-label="たんごん">
+      <rect x="4" y="10" width="92" height="84" rx="18" fill="#c9ced8"/>
+      <rect x="4" y="74" width="92" height="8" fill="#e60033"/>
+      <circle cx="50" cy="44" r="30" fill="#1d2a5c"/>
+      <circle cx="50" cy="44" r="25" fill="#bfe3ff"/>
+      <circle cx="50" cy="50" r="20" fill="#ffd93b"/>
+      <circle cx="43" cy="46" r="3" fill="#222"/><circle cx="57" cy="46" r="3" fill="#222"/>
+      <path d="M45 54 L55 54 L50 60 Z" fill="#f08a00"/>
+      <circle cx="38" cy="54" r="3" fill="#ffaaa0"/><circle cx="62" cy="54" r="3" fill="#ffaaa0"/>
+      <path d="M48 30 q2 -6 6 -4" stroke="#ffd93b" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="bubble" id="say">こんにちは！</div>
+  </div>
+
+  <div class="card" id="gpsCard">
+    <button class="primary" id="gpsBtn">いちじょうほうを オンにする</button>
+    <div class="gps" id="gpsInfo">まだ いちが わかりません</div>
+  </div>
+
+  <div id="stations"></div>
+
+  <div class="card">
+    <div class="q">あつめた もじの かけら</div>
+    <div class="pieces" id="bag"></div>
+  </div>
+
+  <div class="card hidden" id="finalCard">
+    <div class="q">さいごの もんだい！<br>もりや と みどりの の あいだに ある えきは？<br><span class="small">かけらを じゅんばんに タップしてね</span></div>
+    <div class="slots" id="slots"></div>
+    <div class="pieces" id="finalPieces"></div>
+    <div class="row"><button class="ghost" id="clearBtn">やりなおす</button></div>
+    <div class="msg" id="finalMsg"></div>
+  </div>
+
+  <div class="card hidden" id="medalCard">
+    <div class="medalwrap">
+      <svg class="medal" viewBox="0 0 200 200" aria-label="みらいだいら メダル">
+        <path d="M70 0 L100 60 L130 0 Z" fill="#e60033"/>
+        <circle cx="100" cy="115" r="80" fill="#d9a400"/>
+        <circle cx="100" cy="115" r="70" fill="#ffd34d" stroke="#b88a00" stroke-width="4"/>
+        <circle cx="100" cy="115" r="60" fill="none" stroke="#fff3c4" stroke-width="2" stroke-dasharray="4 5"/>
+        <text x="100" y="82" text-anchor="middle" font-size="15" font-weight="900" fill="#7a5a00" font-family="Zen Maru Gothic">みらいだいら</text>
+        <rect x="52" y="98" width="96" height="30" rx="12" fill="#fff"/>
+        <rect x="52" y="118" width="96" height="6" fill="#e60033"/>
+        <path d="M52 110 q0 -12 14 -12 h4 v20 h-18 z" fill="#1d2a5c"/>
+        <rect x="76" y="103" width="14" height="10" rx="2" fill="#1d2a5c"/>
+        <rect x="96" y="103" width="14" height="10" rx="2" fill="#1d2a5c"/>
+        <rect x="116" y="103" width="14" height="10" rx="2" fill="#1d2a5c"/>
+        <circle cx="70" cy="132" r="5" fill="#333"/><circle cx="130" cy="132" r="5" fill="#333"/>
+        <text x="100" y="160" text-anchor="middle" font-size="16" font-weight="900" fill="#7a5a00" font-family="Zen Maru Gothic">メダル</text>
+      </svg>
+    </div>
+    <div class="q" style="text-align:center" id="medalText">メダル ゲット！</div>
+  </div>
+</main>
+
+<div class="modal hidden" id="adult">
+  <div class="box">
+    <div class="q">おとなメニュー</div>
+    <div id="setPass" class="hidden">
+      <p class="small">さいしょに おとなの あいことばを きめてください（このスマホの中だけに ハッシュで ほぞんされます）。</p>
+      <input id="newPass" type="password" placeholder="あいことば">
+      <button class="primary" id="savePass">きめる</button>
+    </div>
+    <div id="askPass" class="hidden">
+      <input id="pass" type="password" placeholder="あいことば">
+      <button class="primary" id="checkPass">ひらく</button>
+      <div class="msg ng" id="passMsg"></div>
+    </div>
+    <div id="adultMenu" class="hidden">
+      <p class="small">GPSが はんのうしない ときに つかいます。</p>
+      <div class="row" id="manualBtns"></div>
+      <p class="small">なまえ（このスマホの中だけ）</p>
+      <input id="nameIn" placeholder="なまえ">
+      <div class="row">
+        <button class="ghost" id="saveName">なまえを ほぞん</button>
+        <button class="ghost" id="resetAll">さいしょから</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="ghost" id="closeAdult">とじる</button></div>
+  </div>
+</div>
+
+<script>
+const SALT = "eki-stamp:";
+const RADIUS = 200; // m
+const STATIONS = [
+  { id:"moriya", name:"もりや", code:"TX15", no:"15", lat:35.9501398, lon:139.9918898,
+    q:"えきめいひょうを みてね。あきはばら ほうめんの となりの えきは？",
+    choices:["かしわのはキャンパス","かしわたなか","ながれやまおおたかのもり","みなみながれやま"],
+    ans:"f0abcd59fa0195468a28e021fba1a66da298b2026961d9c363bf002fd7cc1e73",
+    pieces:["ら","み","い"] },
+  { id:"midorino", name:"みどりの", code:"TX17", no:"17", lat:36.029921, lon:140.056236,
+    q:"この えきの ばんごうは TX-1□。□に はいる すうじは？",
+    choices:["5","6","7","8"],
+    ans:"98e3f526b31c37978e45257ef67e6e968a797234208742cd01fe3aeda4573329",
+    pieces:["だ","ら","い"] }
+];
+const FINAL = "2b2137734f6e39ec453fafcf8c0df9cef539dba1f4edb1f060ef40c4b8c25006";
+const KEY = "eki-stamp-v1";
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+let S = Object.assign({stamped:{}, solved:{}, medal:false, name:"", pass:""}, load());
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+async function sha(s){
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(SALT + s));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function dist(a,b,c,d){
+  const R=6371000, r=Math.PI/180, x=(c-a)*r, y=(d-b)*r;
+  const h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+const $ = id => document.getElementById(id);
+const who = () => S.name ? S.name + "くん" : "きみ";
+function say(t){ $("say").textContent = t; }
+
+let pos = null; // {lat,lon,acc}
+
+function stampSvg(st, on){
+  if(!on) return `<svg class="stamp" viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="#ccc" stroke-width="3" stroke-dasharray="5 4"/><text x="30" y="35" text-anchor="middle" font-size="12" fill="#bbb">まだ</text></svg>`;
+  return `<svg class="stamp" viewBox="0 0 60 60" style="transform:rotate(-12deg)"><circle cx="30" cy="30" r="26" fill="none" stroke="#e60033" stroke-width="4"/><text x="30" y="27" text-anchor="middle" font-size="11" font-weight="900" fill="#e60033">${st.code}</text><text x="30" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="#e60033">${st.name}</text></svg>`;
+}
+
+function render(){
+  const box = $("stations"); box.innerHTML = "";
+  for(const st of STATIONS){
+    const stamped = !!S.stamped[st.id], solved = !!S.solved[st.id];
+    let d = pos ? dist(pos.lat,pos.lon,st.lat,st.lon) : null;
+    const near = d !== null && d <= RADIUS + Math.min(pos.acc||0, 50);
+    const c = document.createElement("div"); c.className = "card";
+    let distTxt = d===null ? "いち じょうほう まち" : (d>=1000 ? `あと ${(d/1000).toFixed(1)} km` : `あと ${Math.round(d)} m`);
+    if(near) distTxt = "えきに ついたよ！";
+    c.innerHTML = `<div class="station">
+      <div class="num"><small>TX</small><b>${st.no}</b></div>
+      <div><div class="name">${st.name}</div><div class="dist">${stamped ? "スタンプ ゲット！" : distTxt}</div></div>
+      ${stampSvg(st, stamped)}</div>`;
+    if(!stamped){
+      const b = document.createElement("button"); b.className="primary";
+      b.textContent = near ? "スタンプを おす！" : "えきに ついたら おせるよ";
+      b.disabled = !near;
+      b.onclick = () => doStamp(st.id);
+      c.appendChild(b);
+    } else if(!solved){
+      const q = document.createElement("div");
+      q.innerHTML = `<div class="q" style="margin-top:10px">${st.q}</div><div class="choices"></div><div class="msg"></div>`;
+      const ch = q.querySelector(".choices"), msg = q.querySelector(".msg");
+      for(const t of st.choices){
+        const b = document.createElement("button"); b.textContent = t;
+        b.onclick = async () => {
+          if(await sha(t) === st.ans){ S.solved[st.id]=true; save(); render(); say(`せいかい！ かけら「${st.pieces.join("・")}」を ゲット！`); }
+          else { msg.className="msg ng"; msg.textContent = "おしい！ もういちど よく みてみよう"; }
+        };
+        ch.appendChild(b);
+      }
+      c.appendChild(q);
+    } else {
+      const p = document.createElement("div"); p.className="small"; p.style.marginTop="6px";
+      p.textContent = `もらった かけら：${st.pieces.join(" ")}`; c.appendChild(p);
+    }
+    box.appendChild(c);
+  }
+  // bag
+  const bag = $("bag"); bag.innerHTML = "";
+  for(const st of STATIONS) for(const ch of st.pieces){
+    const e = document.createElement("div"); const got = !!S.solved[st.id];
+    e.className = "piece" + (got ? "" : " empty"); e.textContent = got ? ch : "？"; bag.appendChild(e);
+  }
+  const all = STATIONS.every(st => S.solved[st.id]);
+  $("finalCard").classList.toggle("hidden", !all || S.medal);
+  $("medalCard").classList.toggle("hidden", !S.medal);
+  if(S.medal) $("medalText").textContent = `${who()}、みらいだいら メダル ゲット！`;
+  if(all && !S.medal) buildFinal();
+  if(!S.medal && !all){
+    const next = STATIONS.find(st => !S.stamped[st.id]);
+    const open = STATIONS.find(st => S.stamped[st.id] && !S.solved[st.id]);
+    if(open) say(`${open.name}の もんだいに こたえよう！`);
+    else if(next && !pos) say(`${who()}、まずは いちじょうほうを オンにしてね`);
+    else if(next) say(`つぎは ${next.name} だよ！`);
+  } else if(all && !S.medal) say("かけらが ぜんぶ そろった！ さいごの もんだいだ！");
+  else say("おめでとう！ メダルを ゲットしたね！");
+}
+
+function doStamp(id){ S.stamped[id] = true; save(); const st = STATIONS.find(s=>s.id===id); render(); say(`${st.name}の スタンプ ゲット！ もんだいに こたえよう`); }
+
+// final puzzle
+let picked = [];
+function buildFinal(){
+  const pieces = STATIONS.flatMap(st => st.pieces);
+  if(!buildFinal.order){ buildFinal.order = pieces.map((p,i)=>i).sort(()=>Math.random()-.5); }
+  const slots = $("slots"); slots.innerHTML = "";
+  for(let i=0;i<pieces.length;i++){ const s=document.createElement("div"); s.className="slot"; s.textContent = picked[i]!==undefined ? pieces[picked[i]] : ""; slots.appendChild(s); }
+  const fp = $("finalPieces"); fp.innerHTML = "";
+  for(const i of buildFinal.order){
+    const b = document.createElement("button"); b.className="piece"; b.textContent = pieces[i];
+    b.disabled = picked.includes(i);
+    b.onclick = async () => {
+      picked.push(i); buildFinal();
+      if(picked.length === pieces.length){
+        const w = picked.map(k=>pieces[k]).join("");
+        if(await sha(w) === FINAL){ S.medal = true; save(); render(); }
+        else { $("finalMsg").className="msg ng"; $("finalMsg").textContent = "ちがうみたい。でんしゃで とおった えきを おもいだそう！"; }
+      } else $("finalMsg").textContent = "";
+    };
+    fp.appendChild(b);
+  }
+}
+$("clearBtn").onclick = () => { picked = []; $("finalMsg").textContent=""; buildFinal(); };
+
+// GPS
+let watchId = null;
+$("gpsBtn").onclick = () => {
+  if(!("geolocation" in navigator)){ $("gpsInfo").textContent = "この ブラウザでは いちじょうほうが つかえません"; return; }
+  if(watchId !== null) return;
+  $("gpsInfo").textContent = "いちを さがしています…";
+  watchId = navigator.geolocation.watchPosition(p => {
+    pos = {lat:p.coords.latitude, lon:p.coords.longitude, acc:p.coords.accuracy};
+    $("gpsBtn").classList.add("hidden");
+    $("gpsInfo").textContent = `いまの いちの ずれ：±${Math.round(pos.acc)} m`;
+    render();
+  }, e => {
+    const m = {1:"いちじょうほうが きょかされていません（せっていを かくにんしてね）",2:"いちが わかりません",3:"じかんぎれ。もういちど ためしてね"};
+    $("gpsInfo").textContent = m[e.code] || "エラー";
+    watchId = null;
+  }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
+};
+
+// adult menu: long-press header 1.5s
+let lp;
+const hdr = $("hdr");
+const startLP = () => { lp = setTimeout(openAdult, 1500); };
+const endLP = () => clearTimeout(lp);
+hdr.addEventListener("touchstart", startLP, {passive:true}); hdr.addEventListener("touchend", endLP);
+hdr.addEventListener("mousedown", startLP); hdr.addEventListener("mouseup", endLP); hdr.addEventListener("mouseleave", endLP);
+hdr.addEventListener("contextmenu", e => e.preventDefault());
+
+function openAdult(){
+  $("adult").classList.remove("hidden");
+  ["setPass","askPass","adultMenu"].forEach(i=>$(i).classList.add("hidden"));
+  if(!S.pass) $("setPass").classList.remove("hidden"); else { $("askPass").classList.remove("hidden"); $("pass").value=""; $("passMsg").textContent=""; }
+}
+function showMenu(){
+  ["setPass","askPass"].forEach(i=>$(i).classList.add("hidden"));
+  $("adultMenu").classList.remove("hidden"); $("nameIn").value = S.name;
+  const mb = $("manualBtns"); mb.innerHTML = "";
+  for(const st of STATIONS){
+    const b = document.createElement("button"); b.className="ghost"; b.textContent = `${st.name}の スタンプ`;
+    b.disabled = !!S.stamped[st.id];
+    b.onclick = () => { doStamp(st.id); $("adult").classList.add("hidden"); };
+    mb.appendChild(b);
+  }
+}
+$("savePass").onclick = async () => { const v=$("newPass").value.trim(); if(v.length<3) return; S.pass = await sha("pass:"+v); save(); showMenu(); };
+$("checkPass").onclick = async () => { if(await sha("pass:"+$("pass").value.trim()) === S.pass) showMenu(); else $("passMsg").textContent = "ちがいます"; };
+$("saveName").onclick = () => { S.name = $("nameIn").value.trim(); save(); render(); };
+$("resetAll").onclick = () => { S = {stamped:{}, solved:{}, medal:false, name:S.name, pass:S.pass}; picked=[]; save(); $("adult").classList.add("hidden"); render(); };
+$("closeAdult").onclick = () => $("adult").classList.add("hidden");
+
+render();
+</script>
+</body>
+</html>
